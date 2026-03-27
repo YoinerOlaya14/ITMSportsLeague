@@ -13,6 +13,8 @@ namespace SportsLeague.Domain.Interfaces.Services
         Task UpdateStatusAsync(int id, TournamentStatus newStatus);
         Task RegisterTeamAsync(int tournamentId, int teamId);
         Task<IEnumerable<Team>> GetTeamsByTournamentAsync(int tournamentId);
+
+
     }
 
 }
