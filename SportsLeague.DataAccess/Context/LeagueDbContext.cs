@@ -17,12 +17,11 @@ public class LeagueDbContext : DbContext
     public DbSet<TournamentTeam> TournamentTeams => Set<TournamentTeam>(); 
     public DbSet<Sponsor> Sponsors => Set<Sponsor>(); 
     public DbSet<TournamentSponsor> TournamentSponsors => Set<TournamentSponsor>(); 
-    public DbSet<Match> Matches => Set<Match>();//Nuevo
+    public DbSet<Match> Matches => Set<Match>();
     public DbSet<MatchResult> MatchResults => Set<MatchResult>();
     public DbSet<Goal> Goals => Set<Goal>();
     public DbSet<Card> Cards => Set<Card>();
-
-
+    public DbSet<MatchLineup> MatchLineups => Set<MatchLineup>();//Nuevo
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -303,7 +302,36 @@ public class LeagueDbContext : DbContext
                   .HasForeignKey(c => c.PlayerId)
                   .OnDelete(DeleteBehavior.Restrict);
         });
+        // ── MatchLineup Configuration ──
+        modelBuilder.Entity<MatchLineup>(entity =>
+        {
+            entity.HasKey(ml => ml.Id);
+            entity.Property(ml => ml.Position)
+                  .IsRequired()
+                  .HasMaxLength(50);
+            entity.Property(ml => ml.IsStarter)
+                  .IsRequired();
+            entity.Property(ts => ts.CreatedAt)
+                  .IsRequired();
+            entity.Property(ts => ts.UpdatedAt)
+                  .IsRequired(false);
 
+            // Relacion 1:N con match
+            entity.HasOne(ml => ml.Match)
+                  .WithMany(m => m.MatchLineups)
+                  .HasForeignKey(ml => ml.MatchId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            // Relacion 1:N con player
+            entity.HasOne(ml => ml.Player)
+                  .WithMany(p => p.MatchLineups)
+                  .HasForeignKey(ml => ml.PlayerId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            // Índice único compuesto: un jugador solo puede estar en el lineup de un partido una vez
+            entity.HasIndex(ml => new { ml.MatchId, ml.PlayerId })
+                  .IsUnique();
+        });
 
     }
 }

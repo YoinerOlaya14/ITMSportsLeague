@@ -19,6 +19,7 @@ namespace SportsLeague.Domain.Entities
         public Team AwayTeam { get; set; } = null!;
         public Referee Referee { get; set; } = null!;
         public MatchResult? MatchResult { get; set; }
+        public ICollection<MatchLineup> MatchLineups { get; set; } = new List<MatchLineup>();
 
         // Relación 1:N con goles y tarjetas
         public ICollection<Goal> Goals { get; set; } = new List<Goal>();
